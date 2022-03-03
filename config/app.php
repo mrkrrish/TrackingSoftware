@@ -225,7 +225,14 @@ return [
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
-
+        'Offers' => App\Offers::class,
+        'Advertisers'=> App\Advertisers::class,
+        'Affiliates' => App\Affiliates::class,
+        'AffiliatePostback' => App\AffiliatePostback::class,
+        'Categories' => App\Categories::class,
+        'Settings' => App\Settings::class,
+        'GlobalPostback' => App\GlobalPostback::class,
+        'User' => App\User::class,
     ],
 
 ];

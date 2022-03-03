@@ -129,14 +129,12 @@
                 <div class="row mb-2">
                     <div class="col-lg-6">
                         <label for="country" class="form-label">Country</label>
-                        <select name="country" id="country" class="form-select select2">
+                        <select name="country" id="select-with-flags" class="form-select">
                             <option value="" readonly>Select Country</option>
-                            @foreach(config('world.countries') as $country)
-                            <option value="{{$country['code']}}" {{ $affiliate->country == $country['code'] ? 'selected' : '' }}>{{ $country['code'] .' - '. $country['name']}}</option>
+                            @foreach(config('country.countries') as $country)
+                            <option value="{{ $country['iso2'] }}" data-data='{"flag": "{{Str::lower($country['iso2'])}}"}' {{ Auth::User()->country == $country['iso2'] ? 'selected' : '' }}>{{ $country['name'] }}</option>
                             @endforeach
                         </select>
-
-
                     </div>
                     <div class="col-lg-6">
                         <label for="manager" class="form-label">Manager</label>

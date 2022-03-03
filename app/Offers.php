@@ -22,4 +22,8 @@ class Offers extends Model
     public function Affiliates() {
         return $this->hasMany('App\Affiliates');
     }
+    public static function getAdvertiserList() {
+        $advertisers = Advertisers::all();
+         return view('campaigns.create', ['advertisers'=> $advertisers]);
+     }
 }

@@ -24,14 +24,21 @@
         </div>
       </div>
     </div>
-
-<div class="row justify-content-between">
-    @if(session()->has('view-message'))
-    <div id="alertmessage" class="alert alert-success alert-dismissible">
-        {{ session('view-message') }}
-        <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+@if (session()->has('view-message'))
+<div class="modal modal-blur fade show" id="modal-info" tabindex="-1" role="dialog" aria-modal="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-body text-center py-5">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-md mb-4 text-green" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="9" /><path d="M9 12l2 2l4 -4" /></svg>
+          <h2>{{session('view-message')}}</h2>
+        </div>
+      </div>
     </div>
-    @endif
+  </div>
+@endif
+<div class="row justify-content-between">
+
  <div class="col-md-6 card">
         <ul class="nav nav-tabs" data-bs-toggle="tabs">
           <li class="nav-item">
@@ -58,7 +65,7 @@
                         <label for="email" class="form-label">Email Address</label>
                         <input type="email" name="email" class="form-control @error('email')
                         {{__('is-invalid')}}
-                    @enderror" id="email"  value="{{Auth::User()->email}}">
+                    @enderror" id="email"  value="{{Auth::User()->email}}" disabled>
                     @error('email')
                         <div class="invalid-feedback">{{$message}}</div>
                         @enderror
@@ -129,14 +136,12 @@
                 <div class="row mb-2">
                     <div class="col-lg-6">
                         <label for="country" class="form-label">Country</label>
-                        <select name="country" id="country" class="form-select select2">
+                        <select name="country" id="select-with-flags" class="form-select">
                             <option value="" readonly>Select Country</option>
-                            @foreach(config('world.countries') as $country)
-                            <option value="{{$country['code']}}" {{ Auth::User()->country == $country['code'] ? 'selected' : '' }}>{{ $country['code'] .' - '. $country['name']}}</option>
+                            @foreach(config('country.countries') as $country)
+                            <option value="{{ $country['iso2'] }}" data-data='{"flag": "{{Str::lower($country['iso2'])}}"}' {{ Auth::User()->country == $country['iso2'] ? 'selected' : '' }}>{{ $country['name'] }}</option>
                             @endforeach
                         </select>
-
-
                     </div>
                     @if (Auth::User()->role !== 'Admin')
                     <div class="col-lg-6">
@@ -181,19 +186,21 @@
         <li class="nav-item">
           <a href="#tabs-home-14" class="nav-link active" data-bs-toggle="tab">Change Password</a>
         </li>
-        <li class="nav-item ml-auto">
-            <form action="{{route('admin.reset_password')}}" method="post">
-                @csrf
-                <input type="hidden" name="id" value="{{Auth::User()->id}}">
-                <button type="submit" class="btn btn-outline-yellow btn-sm" >Reset Password</button>
-            </form>
-        </li>
       </ul>
     <div class="card-body">
     <div class="tab-content">
         <div class="tab-pane active show" id="tabs-home-13">
             <form action="{{route('admin.change_password')}}" method="post" class="form">
                 @csrf
+                <div class="col-lg-12 mb-3">
+                    <label for="current_password" class="form-label">Current Password</label>
+                        <input type="current_password" name="current_password" class="form-control @error('current_password')
+                        {{__('is-invalid')}}
+                    @enderror" id="password" placeholder="Current Password" autocomplete="off">
+                    @error('current_password')
+                    <div class="invalid-feedback">{{$message}}</div>
+                    @enderror
+                    </div>
                     <div class="col-lg-12 mb-3">
                         <label for="password" class="form-label">New Password</label>
                         <input type="password" name="password" class="form-control @error('password')
@@ -280,6 +287,14 @@
 @endsection
 
 @section('script')
+@if (session()->has('view-message'))
+<script>
+$(document).ready(function(){
+    $("#modal-info").modal("show");
+});
+</script>
+
+@endif
 <script>
 
 function cl_change() {

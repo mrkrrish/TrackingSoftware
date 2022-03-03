@@ -74,6 +74,7 @@ class AffiliatesController extends Controller
             'manager' => 'nullable',
         ]);
 
+
         if ($validation->fails()) {
             return redirect()
             ->back()

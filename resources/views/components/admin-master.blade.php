@@ -101,6 +101,8 @@ document.getElementById('logout-form').submit();">
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="{{ asset('dist/libs/flatpickr/dist/flatpickr.min.js') }}"></script>
 <script src="{{ asset('dist/libs/flatpickr/dist/plugins/rangePlugin.js') }}"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
 <script>
 $(document).ready(function() {
 $('.select2').select2();
@@ -111,6 +113,35 @@ $('.select2').select2();
 setTimeout(function() {
 $('#alertmessage').fadeOut();
 }, 3000);
+
+setTimeout(function() {
+$('#modal-info').fadeOut();
+}, 5000);
+
+</script>
+<script>
+    $(document).ready(function () {
+    $('.selectized').selectize({
+        sortField: "text",
+    });
+  	$('#select-tags').selectize({
+  		plugins: ['remove_button'],
+  	});
+  });
+
+  $(document).ready(function () {
+  	$('#select-with-flags').selectize({
+  		render: {
+  			option: function (data, escape) {
+  				return '<div class="option"><span class="flag flag-country-' + data.flag + ' mr-2"></span>' + escape(data.text) + '</div>';
+  			},
+  			item: function (data, escape) {
+  				return '<div class="d-flex align-items-center"><span class="flag flag-country-' + data.flag + ' mr-2"></span>' + escape(data.text) + '</div>';
+  			}
+  		}
+  	});
+  });
+
 </script>
 @yield('script')
 </body>

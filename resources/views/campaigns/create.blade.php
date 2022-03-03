@@ -17,7 +17,7 @@
                 <div class="btn-list">
 <!--                  <span class="d-none d-sm-inline">-->
 <!--                    <a href="#" class="btn btn-dark">-->
-                      
+
 <!--<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-filter"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg> Advanced Mode-->
 <!--                    </a>-->
 <!--                  </span>-->
@@ -25,7 +25,7 @@
                 </div>
               </div>
             </div>
-          </div>  
+          </div>
           <div class="row">
              <div class="col-md-12">
               <div class="card">
@@ -64,48 +64,43 @@
               <div class="col-md-3">
                   <div class="form-group mb-3 ">
                  <label class="form-label">Offer Currency</label>
-               @php
-                $file = file_get_contents(base_path('public/static/currencycodes.json'));
-                $decode = json_decode($file);
-                $file_csv = array_values($decode);
-                @endphp
-            <select class="form-select">
+            <select class="form-select" id="select-with-flags">
               <option value="" readonly><b>Select Currency</b></option>
-                    @foreach($file_csv as $currency => $value)
-                    <option value="{{ $value->CurrencyCode }}">{{ $value->CurrencyCode.' - ' .$value->CurrencyName }}</option>
-                    @endforeach
+              @foreach (config('country.countries') as $currency)
+              <option value="{{ $currency['currency'] }}" data-data='{"flag": "{{Str::lower($currency['iso2'])}}"}'>{{ $currency['currency_name'] }}</option>
+              @endforeach
               </select>
             <small class="form-hint"></small>
-            
-  
-                  
-        </div>   
+        </div>
               </div>
               <div class="col-md-4">
                   <div class="form-group mb-3 ">
           <label class="form-label">Advertiser Profile</label>
           <div>
-              <select class="form-select"> 
+              <select class="form-select selectized">
               <option value="">Select Advertiser Profile</option>
+                    @foreach (Offers::getAdvertiserList()->advertisers as $advertiser)
+                    <option value="{{$advertiser->id}}">{{$advertiser->name}}</option>
+                    @endforeach
               </select>
-           
+
             <small class="form-hint"></small>
           </div>
-        </div> 
+        </div>
               </div>
             <div class="col-md-4">
                <div class="form-group mb-3 ">
           <label class="form-label">Categories</label>
           <div>
         <select name="tags" id="select-tags" class="form-select" multiple>
-            
-        <option value="cat1" >Category1</option>
-        <option value="cat2">Category2</option>
+            @foreach (Categories::getCategoriesList() as $category)
+            <option value="{{$category->category_id}}">{{$category->category_name}}</option>
+            @endforeach
          </select>
             <small class="form-hint"></small>
           </div>
         </div>
-          </div> 
+          </div>
           </div>
       <div class="row mb-4">
           <div class="col-md-4">
@@ -169,9 +164,9 @@
     </label>
   </div>
 </div>
-</div>    
-</div>    
-    
+</div>
+</div>
+
 
       </div>
     <div class="row mb-3">
@@ -193,16 +188,19 @@
     </div>
     <hr>
     <div class="form-group">
-                        <label class="form-label">Your Parameters</label>
-                        <div class="selectgroup selectgroup-pills">
-                          @foreach(config('services.parameters') as $parameter => $value)
-                          <label class="selectgroup-item">
-                            <input type="checkbox" name="parameters" value="{{$value}}" class="selectgroup-input" id="{{$parameter}}">
-                            <span class="selectgroup-button">{{$value}}</span>
-                          </label>
-                          @endforeach
-                        </div>
-                      </div>
+        <label class="form-label bg-light mb-4"><h1 class="p-2">Your Parameters</h1></label>
+        <div class="row">
+            @foreach(config('services.parameters') as $parameter => $value)
+            <div class="col-md-2">
+                <label class="form-check form-switch">
+                    <input type="checkbox" name="parameters" class="form-check-input" id="{{$parameter}}" onchange="url_change();">
+                    <span class="form-check-label">{{$value}}</span>
+                    </label>
+            </div>
+
+            @endforeach
+        </div>
+        </div>
       <hr>
       <div class="row">
           <div class="col-md-12">
@@ -210,12 +208,12 @@
         <label class="fomr-label">Offer Description &amp; Terms/KPI</label>
     </div>
               <textarea id="offer_terms" class="form-control h-100" name="offer_terms">
-                  
+
               </textarea>
           </div>
       </div>
 
-                 
+
 
         <div class="form-footer">
           <button type="submit" class="btn btn-primary">Submit</button>
@@ -226,8 +224,8 @@
                   </div>
                 </div>
               </div>
-            </div> 
-              
+            </div>
+
           </div>
 
 @section('script')
@@ -251,14 +249,8 @@ tinymce.init({
 });
 
   </script>
-<script>
-    $(document).ready(function () {
-  	$('#select-tags').selectize({
-  		plugins: ['remove_button'],
-  	});
-  });
-  
-</script>
+
+
 <script>
   document.addEventListener("DOMContentLoaded", function () {
   	flatpickr(document.getElementById('calendar-start'), {
@@ -269,26 +261,31 @@ tinymce.init({
   	});
   });
 </script>
+
 <script>
-@foreach(config('services.parameters') as $parameter => $value)
-    $("{{'#'.$parameter}}").on('click', function() {
-        $("{{'#'.$parameter}}").prop('checked',true);
-        
-        // $("{{'#'.$parameter}}")
-        if($("{{'#'.$parameter}}").prop('checked', true)) {
-        var camp_url = $('#offer_url').val();
-        var camp_macro = $('{{'#'.$parameter}}').val();
-        var camp_uc = camp_url + camp_macro;
-        $('#offer_url').val(camp_uc);
-        }else if($("{{'#'.$parameter}}").prop('checked', false)) {
-        var camp_url = $('#offer_url').val();
-        var camp_uc = camp_url;
-        $('#offer_url').val(camp_uc);
-        }
-
-
+$('#offer_url').on('change', function(e) {
+e.preventDefault();
+var local_url = $('#offer_url').val();
+if(local_url == null) {
+    localStorage.setItem('destination_link', ' ');
+}
+localStorage.setItem('destination_link', local_url);
 });
+
+function url_change() {
+var offerurl= localStorage.getItem('destination_link');
+@foreach(config('services.parameters') as $parameter => $value)
+
+var {{$parameter}} = $("{{'#'.$parameter}}").prop('checked');
+
+if({{$parameter}} === true)
+{
+var offerurl = offerurl + "{{$value}}";
+}
+
 @endforeach
+$('#offer_url').val(offerurl+'');
+}url_change();
 </script>
 @endsection
 @endsection
