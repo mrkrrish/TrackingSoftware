@@ -186,6 +186,7 @@
         <div class="tab-pane active show" id="tabs-home-13">
             <form action="{{route('affiliate.change_password')}}" method="post" class="form">
                 @csrf
+                <input type="hidden" name="id" value="{{$affiliate->id}}" class="form-control">
                     <div class="col-lg-12 mb-3">
                         <label for="password" class="form-label">New Password</label>
                         <input type="password" name="password" class="form-control @error('password')

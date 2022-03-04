@@ -46,7 +46,7 @@ class AdvertisersController extends Controller
         ]);
 
         if($create_advertiser) {
-            SESSION::flash('view-message', 'New Advertiser Account Created!');
+            Session::flash('view-message', 'New Advertiser Account Created!');
             return redirect()->route('advertisers');
         }
 
@@ -83,7 +83,7 @@ class AdvertisersController extends Controller
         $update_advertiser = Advertisers::where('id', $request->id)->update($validation->validated());
 
         if($update_advertiser) {
-            SESSION::flash('view-message', 'Advertiser Profile Updated!');
+            Session::flash('view-message', 'Advertiser Profile Updated!');
             return redirect()->back()->withInput();
         }
 
@@ -92,7 +92,7 @@ class AdvertisersController extends Controller
     {
         $delete_advertiser = Advertisers::where('id', $request->id)->delete();
         if($delete_advertiser) {
-            SESSION::flash('view-message', 'Advertiser account Deleted');
+            Session::flash('view-message', 'Advertiser account Deleted');
             return redirect()->back()->withInput();
         }
     }
@@ -108,19 +108,26 @@ class AdvertisersController extends Controller
             ->withErrors($password_validator->errors())
             ->withInput();
         }else{
-            SESSION::flash('view-message', 'Advertiser Password Updated! New Password is: '. $request->password);
-            return redirect()->back()->withInput();
+            $password = Hash::make($request->password);
+            $update_advertiser_password = User::where('id', $request->id)->update([
+                'password'=>$password,
+            ]);
+            if($update_advertiser_password) {
+                Session::flash('view-message', 'Advertiser Password Updated! New Password is: '. $request->password);
+                return redirect()->back()->withInput();
+            }abort(401);
+
         }
     }
     public function reset_password(Request $request)
     {
         $new_password = Str::random(16);
         $password = Hash::make($new_password);
-        $update_affliate_password = Advertisers::where('id', $request->id)->update([
+        $update_advertiser_password = Advertisers::where('id', $request->id)->update([
             'password'=>$password,
         ]);
-        if($update_affliate_password) {
-            SESSION::flash('view-message', 'Advertiser Password Updated! New Password is: '.$new_password);
+        if($update_advertiser_password) {
+            Session::flash('view-message', 'Advertiser Password Updated! New Password is: '.$new_password);
             return redirect()->back()->withInput();
         }
         abort(401);

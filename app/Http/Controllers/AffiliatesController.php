@@ -109,8 +109,14 @@ class AffiliatesController extends Controller
             ->withErrors($password_validator->errors())
             ->withInput();
         }else{
+            $password = Hash::make($request->password);
+            $update_affiliate_password = User::where('id', $request->id)->update([
+                'password'=>$password,
+            ]);
+            if($update_affiliate_password) {
             SESSION::flash('view-message', 'Affiliate Password Updated! New Password is: '. $request->password);
             return redirect()->back()->withInput();
+            }abort(401);
         }
     }
     public function reset_password(Request $request)

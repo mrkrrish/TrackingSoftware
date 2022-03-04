@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use App\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\support\Facades\Session;
 
 class AdminsController extends Controller
@@ -60,8 +61,16 @@ class AdminsController extends Controller
             ->withErrors($password_validator->errors())
             ->withInput();
         }else{
-            Session::flash('view-message', 'Your Password has been Updated! New Password is: '. $request->password);
-            return redirect()->back()->withInput();
+
+            $password = Hash::make($request->password);
+            $update_password = User::where('id', Auth::User()->id)->update([
+                'password'=>$password,
+            ]);
+            if($update_password) {
+                Session::flash('view-message', 'Your Password has been Updated! New Password is: '. $request->password);
+                return redirect()->back()->withInput();
+            }abort(401);
+
         }
     }
 
